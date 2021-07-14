@@ -1,26 +1,27 @@
 import { SVG } from '@svgdotjs/svg.js';
-import { ChangeEvent } from 'react';
 import { T, BRANCH_BLOCK_SIZE } from './config';
 import Branch from './Branch';
 
 import './index.less';
 import { CPos } from './utils';
 
+// https://jsfiddle.net/tekh27my/2/
 window.SVG = SVG;
 
 type Pos = number[];
+type Direction = 'ltr' | 'rtl';
 
 let uid = 0;
 export default class DeepMapEditor {
-  drawer: any; // TODO: fix type
+  drawer: import('@svgdotjs/svg.js').Svg;
   size: Pos = [800, 400];
   branches: any[] = [];
   branchesLeft: any[] = [];
   branchesRight: any[] = [];
   _rootNode: any;
-  _curDirection: 'ltr' | 'rtl' = 'rtl';
+  _curDirection: Direction = 'rtl';
   _changeDirectionSize: number = 3;
-  cPos: CPos;
+  cPos: CPos = new CPos(400, 200);
   constructor(container: HTMLElement) {
     this.drawer = SVG()
       .size(...this.size)
@@ -45,7 +46,6 @@ export default class DeepMapEditor {
       .y(rootPos[1])
       .fill(T.rootNode.bg);
 
-    this.cPos = new CPos(400, 200);
     this.branches = this.branchesRight;
     this._rootNode.on('click', () => {
       this._addBranch(this.size.map(i => i / 2));
