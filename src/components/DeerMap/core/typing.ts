@@ -1,33 +1,19 @@
-type DeerBranchTheme = 'type1' | 'type2';
+export type Direction = 'ltr' | 'rtl';
 
-export type DeerMapBranch = {
-  type: 'branch';
-  __parent: DeerMapBranch | DeerMapRootNode;
-  children: DeerMapBranch[];
-  conf: {
-    text: string;
-    img?: string;
-  };
-  theme: DeerBranchTheme;
-};
+export interface Bbox {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+  // container size
+  cW: number;
+  cH: number;
+}
 
-export type DeerMapRootNode = {
-  type: 'root';
-  lChildren: DeerMapBranch[];
-  rChildren: DeerMapBranch[];
-  conf: {
-    text: string;
-    img?: string;
-  };
-  theme: DeerBranchTheme;
-};
-
-const tree: DeerMapRootNode = {
-  type: 'root',
-  lChildren: [],
-  rChildren: [],
-  conf: {
-    text: 'xxx',
-  },
-  theme: 'type1',
-};
+export interface OptType {
+  width: number;
+  height: number;
+  className: string;
+  intialPos: number[];
+  theme: string; // TODO: check
+}

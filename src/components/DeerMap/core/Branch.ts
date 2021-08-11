@@ -1,92 +1,85 @@
+import RootNode from './RootNode';
+import { branchType, theme } from './constant';
+import { Bbox, Direction } from './typing';
 import { SVG } from '@svgdotjs/svg.js';
-import { BRANCH_BLOCK_SIZE, T } from './config';
-import { CPos, randomColor } from './utils';
+import { randomColor } from './utils';
 
-let uid = 0;
+type ParentType = RootNode | Branch;
+interface Opt {
+  parent: ParentType;
+  direction: Direction;
+}
+
+const BranchTheme = theme['branch'];
 export default class Branch {
-  private _branch: import('@svgdotjs/svg.js').G;
-  _data: any; // TODO: check
-  _parent: any;
-  cPos: CPos;
-  private _chldren: import('@svgdotjs/svg.js').G;
-  private _rect: import('@svgdotjs/svg.js').Rect;
-  constructor(cPos: CPos) {
-    this._branch = SVG().group();
+  type = branchType;
+  children: Branch[] = [];
+  _parent: ParentType;
+  bbox: Bbox = { x: 0, y: 0, w: 0, h: 0, cW: 0, cH: 0 };
+  private _drawerNode: import('@svgdotjs/svg.js').G;
+  private _ractBg?: import('@svgdotjs/svg.js').Rect;
+  direction: Direction;
+  static of(opt: Opt) {
+    return new Branch(opt);
+  }
+  constructor({ parent, direction }: Opt) {
+    this._parent = parent;
+    this._drawerNode = SVG().group();
+    this.direction = direction;
     this._init();
   }
-  static of(cPos: CPos) {
-    return new Branch(cPos);
-  }
-  _init() {
-    const branch = this._branch;
-    branch.addClass('deer-map__branch-ltr');
-    this._chldren = branch.group().addClass('deer-map__branch-children');
-    this._rect = branch
-      // --
-      .rect(...BRANCH_BLOCK_SIZE)
+  private _init() {
+    const parentBbox = this._parent.bbox;
+    const [w, h] = BranchTheme.intialSize;
+    const [x, y] = [
+      // // x
+      this.direction === 'ltr' ? parentBbox.x + parentBbox.w : parentBbox.x - w,
+      // y
+      parentBbox.y - (h - parentBbox.h) / 2,
+    ];
+    Object.assign(this.bbox, { x, y, w, h });
+    this._drawerNode.addClass('deep-map-branch');
+    this._ractBg = this._drawerNode
+      .rect(w, h)
+      .x(x)
+      .y(y)
       .fill(randomColor());
-    this._bind();
-  }
-  bbox() {
-    return this._branch.bbox();
-  }
-  pos([x, y]: number[]) {
-    const reactBbox = this._rect.bbox();
-    this.cPos = new CPos(x + reactBbox.width, y + reactBbox.height / 2);
-    this._branch.x(x).y(y);
-  }
-  inject(parentNode: any) {
-    this._branch.insertBefore(parentNode);
-  }
-  _justifyBranches(childrens: any[], parent: any) {
-    let totolHeight = 0;
-    let top = 0;
-    childrens.forEach(item => {
-      const { $ele } = item;
-      const cBbox = $ele.bbox();
-      const cH = cBbox.height;
-      item.bbox = cBbox;
-      totolHeight += cH;
+    this._ractBg.on('click', () => {
+      this._addSubBranch();
     });
-    top = totolHeight / 2;
-    const xPos = 40;
-    childrens.forEach(item => {
-      const { $ele, bbox } = item;
-      item.pos = [xPos, -top];
-      top = top - bbox.height;
-      $ele.pos(this.cPos.pos(item.pos));
-      if (!$ele.injected) {
-        this._chldren.add($ele._branch);
-      }
-    });
-    if (parent) {
-      this._justifyBranches();
+  }
+
+  insertTo(parentDom: import('@svgdotjs/svg.js').Element) {
+    this._drawerNode.insertBefore(parentDom);
+  }
+
+  justifyBboxSize(partialBbox: Partial<Bbox>) {
+    const { x, y, w, h } = { ...this.bbox, ...partialBbox };
+    Object.assign(this.bbox, { x, y, w, h });
+    if (this._ractBg) {
+      this._ractBg.x(x).y(y);
     }
   }
-  _bind() {
-    this._branch.on('click', e => {
-      e.stopPropagation();
-      e.preventDefault();
-      const $subBranch = Branch.of({ cPos: this.cPos });
-      const subData = {
-        uid,
-        pos: { x: 0, y: 0 },
-        $ele: $subBranch,
-        injected: false,
-        subBranches: [],
-      };
-      this._data.subBranches.push(subData);
-      $subBranch._data = subData;
-      this._justifyBranches(this._data.subBranches, this._data._parent);
+
+  justifyChidrenPos() {
+    let totalH = 0;
+    const children = this.children;
+    children.forEach(branch => {
+      totalH += branch.bbox.h;
     });
-    // remove
-    //     this._branch.on('click', e => {
-    //       this._parent.forEach((item, idx) => {
-    //         if (item === this._data) {
-    //           this._parent.splice(idx, 1);
-    //           this._branch.remove();
-    //         }
-    //       });
-    //     });
+    let lastY = this.bbox.y - (totalH / 2 - this.bbox.h / 2);
+    children.forEach(branch => {
+      branch.justifyBboxSize({ y: lastY });
+      lastY += branch.bbox.h;
+    });
+  }
+
+  private _addSubBranch() {
+    const direction = this.direction;
+    const children = this.children;
+    const branch = Branch.of({ parent: this, direction });
+    branch.insertTo(this._drawerNode);
+    children.push(branch);
+    this.justifyChidrenPos();
   }
 }
