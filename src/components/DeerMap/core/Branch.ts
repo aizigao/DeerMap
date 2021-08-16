@@ -17,7 +17,7 @@ export default class Branch {
   _parent: ParentType;
   bbox: Bbox = { x: 0, y: 0, w: 0, h: 0, cW: 0, cH: 0 };
   private _drawerNode: import('@svgdotjs/svg.js').G;
-  private _ractBg?: import('@svgdotjs/svg.js').Rect;
+  private _ractBg: import('@svgdotjs/svg.js').Rect;
   direction: Direction;
   static of(opt: Opt) {
     return new Branch(opt);
@@ -26,9 +26,6 @@ export default class Branch {
     this._parent = parent;
     this._drawerNode = SVG().group();
     this.direction = direction;
-    this._init();
-  }
-  private _init() {
     const parentBbox = this._parent.bbox;
     const [w, h] = BranchTheme.intialSize;
     const [x, y] = [
@@ -51,26 +48,37 @@ export default class Branch {
 
   insertTo(parentDom: import('@svgdotjs/svg.js').Element) {
     this._drawerNode.insertBefore(parentDom);
+    this.justifyBboxSize(this.direction);
   }
 
-  justifyBboxSize(partialBbox: Partial<Bbox>) {
-    const { x, y, w, h } = { ...this.bbox, ...partialBbox };
-    Object.assign(this.bbox, { x, y, w, h });
-    if (this._ractBg) {
-      this._ractBg.x(x).y(y);
-    }
+  justifyBboxPos(partialBbox: Partial<Bbox>) {
+    const { x, y, w, h, cW, cH } = { ...this.bbox, ...partialBbox };
+    this._ractBg.x(x).y(y);
+    Object.assign(this.bbox, { x, y, w, h, cW: Math.max(cW, w), cH: Math.max(cH, h) });
+    this.justifyChidrenPos();
+    this._drawerNode.attr({ 'data-bbox': JSON.stringify(this.bbox) });
+  }
+
+  justifyBboxSize(dirtion: Direction) {
+    const chilrenH = this.children.reduce((assem, item) => {
+      return item.bbox.cH + assem;
+    }, 0);
+    this.bbox.cH = Math.max(chilrenH, this.bbox.h);
+
+    this._parent.justifyBboxSize(dirtion);
+    this._drawerNode.attr({ 'data-bbox': JSON.stringify(this.bbox) });
   }
 
   justifyChidrenPos() {
     let totalH = 0;
     const children = this.children;
     children.forEach(branch => {
-      totalH += branch.bbox.h;
+      totalH += branch.bbox.cH;
     });
     let lastY = this.bbox.y - (totalH / 2 - this.bbox.h / 2);
     children.forEach(branch => {
-      branch.justifyBboxSize({ y: lastY });
-      lastY += branch.bbox.h;
+      branch.justifyBboxPos({ y: lastY + (branch.bbox.cH - branch.bbox.h) / 2 });
+      lastY += branch.bbox.cH;
     });
   }
 
@@ -78,8 +86,7 @@ export default class Branch {
     const direction = this.direction;
     const children = this.children;
     const branch = Branch.of({ parent: this, direction });
-    branch.insertTo(this._drawerNode);
     children.push(branch);
-    this.justifyChidrenPos();
+    branch.insertTo(this._ractBg);
   }
 }

@@ -16,6 +16,7 @@ export default class RootNode {
   public static of(opt: OptType, drawer: Drawer) {
     return new RootNode(opt, drawer);
   }
+
   constructor(opt: OptType, drawer: Drawer) {
     const [w, h] = rootNodeTheme.intialSize;
     const [x, y] = [(opt.width - w) / 2, (opt.height - h) / 2];
@@ -27,9 +28,23 @@ export default class RootNode {
     this.bbox = { x, y, w, h, cW: 0, cH: 0 };
     this.bindEvents();
   }
+
   bindEvents() {
     this._drawerNode.on('click', () => {
       this._addBranch();
+    });
+  }
+
+  justifyBboxSize(direction: Direction) {
+    const curChildren = direction === 'ltr' ? this.rightChildren : this.leftChildren;
+    let totalH = 0;
+    curChildren.forEach(branch => {
+      totalH += branch.bbox.cH;
+    });
+    let lastY = this.bbox.y - (totalH / 2 - this.bbox.h / 2);
+    curChildren.forEach(branch => {
+      branch.justifyBboxPos({ y: lastY + (branch.bbox.cH - branch.bbox.h) / 2 });
+      lastY += branch.bbox.cH;
     });
   }
 
@@ -47,16 +62,7 @@ export default class RootNode {
       direction = 'rtl';
     }
     const branch = Branch.of({ parent: this, direction });
-    branch.insertTo(this._drawerNode);
     curChildren.push(branch);
-    let totalH = 0;
-    curChildren.forEach(branch => {
-      totalH += branch.bbox.h;
-    });
-    let lastY = this.bbox.y - (totalH / 2 - this.bbox.h / 2);
-    curChildren.forEach(branch => {
-      branch.justifyBboxSize({ y: lastY });
-      lastY += branch.bbox.h;
-    });
+    branch.insertTo(this._drawerNode);
   }
 }
