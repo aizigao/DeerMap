@@ -11,6 +11,14 @@ interface Opt {
 }
 
 const BranchTheme = theme['branch'];
+
+/**
+ * TODO:
+ * - branch 拖拽
+ * -子组件:
+ *   * 线
+ *   * text
+ */
 export default class Branch {
   type = branchType;
   children: Branch[] = [];
@@ -29,9 +37,9 @@ export default class Branch {
     const parentBbox = this._parent.bbox;
     const [w, h] = BranchTheme.intialSize;
     const [x, y] = [
-      // // x
+      // -- x
       this.direction === 'ltr' ? parentBbox.x + parentBbox.w : parentBbox.x - w,
-      // y
+      // -- y
       parentBbox.y - (h - parentBbox.h) / 2,
     ];
     Object.assign(this.bbox, { x, y, w, h });

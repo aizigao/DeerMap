@@ -1,15 +1,8 @@
-import { SVG } from '@svgdotjs/svg.js';
-import { T, BRANCH_BLOCK_SIZE } from './config';
-import Branch from './Branch';
 import EditorMap from './EditorMap';
 import RootNode from './RootNode';
 
 import './index.less';
-import { CPos } from './utils';
 import { OptType } from './typing';
-
-type Pos = number[];
-type Direction = 'ltr' | 'rtl';
 
 const defaultOpt = {
   width: 1200,

@@ -4,6 +4,8 @@ export const branchType = Symbol('branch');
 export const rootNodeType = Symbol('rootNode');
 
 const colors = {};
+
+// themes config
 export const theme = {
   // https://www.materialpalette.com/
   rootNode: {
