@@ -25,7 +25,7 @@ export default class EditorMap {
       .viewbox(`0 0 ${width} ${height}`)
       .addClass('deer-map')
       .css({
-        background: '#e0e0e0',
+        // background: '#e0e0e0',
       });
   }
 }

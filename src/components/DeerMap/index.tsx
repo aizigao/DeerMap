@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import DeepMapEditor from './core';
-import ss from './index.less';
+import './index.less';
 
 type DeerMapProps = {};
 
@@ -16,7 +16,7 @@ const DeerMap: React.FC<DeerMapProps> = () => {
   const createDeerMap = (ref: HTMLDivElement) => {
     new DeepMapEditor(ref);
   };
-  return <div className={ss['editor-container']} ref={createDeerMap}></div>;
+  return <div className={'editor-container'} ref={createDeerMap}></div>;
 };
 
 export default DeerMap;

@@ -1,6 +1,5 @@
 import EditorMap from './EditorMap';
 import RootNode from './RootNode';
-
 import './index.less';
 import { OptType } from './typing';
 
