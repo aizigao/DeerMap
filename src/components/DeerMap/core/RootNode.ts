@@ -1,5 +1,5 @@
 import Branch from './Branch';
-import { theme } from './constant';
+import { rootNodeType, theme } from './constant';
 import { Bbox, Direction, OptType } from './typing';
 
 type Drawer = import('@svgdotjs/svg.js').Svg;
@@ -10,9 +10,11 @@ const rootNodeTheme = theme['rootNode'];
 export default class RootNode {
   leftChildren: Branch[] = [];
   rightChildren: Branch[] = [];
+  private _level = 0;
   bbox: Bbox = { x: 0, y: 0, w: 0, h: 0, cW: 0, cH: 0 };
   private _maxSideNumInital = 3;
   private _drawerNode: import('@svgdotjs/svg.js').Rect;
+  type = rootNodeType;
   public static of(opt: OptType, drawer: Drawer) {
     return new RootNode(opt, drawer);
   }
@@ -29,6 +31,9 @@ export default class RootNode {
     this.bindEvents();
   }
 
+  get level() {
+    return this._level;
+  }
   bindEvents() {
     this._drawerNode.on('click', () => {
       this._addBranch();
