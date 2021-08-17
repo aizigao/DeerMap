@@ -53,6 +53,7 @@ export default class Branch {
       .x(x)
       .y(y)
       .fill(randomColor());
+      // .fill('transparent');
     this._pathNode = BranchPath.of({ level: this._level, direction: this.direction });
     this._pathNode.insertInto(this._drawerNode);
     this._ractBg.on('click', () => {
@@ -90,7 +91,7 @@ export default class Branch {
         x: this.bbox.x + (this.direction === 'ltr' ? this.bbox.w : 0),
         y: this.bbox.y + this.bbox.h / 2,
       });
-    this._drawerNode.attr({ 'data-bbox': JSON.stringify(this.bbox) });
+    // this._drawerNode.attr({ 'data-bbox': JSON.stringify(this.bbox) });
   }
 
   justifyBboxSize(dirtion: Direction) {
@@ -100,7 +101,7 @@ export default class Branch {
     this.bbox.cH = Math.max(chilrenH, this.bbox.h);
 
     this._parent.justifyBboxSize(dirtion);
-    this._drawerNode.attr({ 'data-bbox': JSON.stringify(this.bbox) });
+    // this._drawerNode.attr({ 'data-bbox': JSON.stringify(this.bbox) });
   }
 
   justifyChidrenPos() {
