@@ -3,6 +3,7 @@ import { SVG } from '@svgdotjs/svg.js';
 interface IEditorMap {
   width: number;
   height: number;
+  viewPort: number[];
 }
 
 /**
@@ -19,10 +20,10 @@ export default class EditorMap {
   static of(opt: IEditorMap) {
     return new EditorMap(opt);
   }
-  init({ width, height }: IEditorMap) {
+  init({ width, height, viewPort }: IEditorMap) {
     return SVG()
       .size(width, height)
-      .viewbox(`0 0 ${width} ${height}`)
+      .viewbox(viewPort.join(' '))
       .addClass('deer-map')
       .css({
         // background: '#e0e0e0',

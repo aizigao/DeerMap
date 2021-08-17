@@ -15,5 +15,6 @@ export interface OptType {
   height: number;
   className: string;
   intialPos: number[];
+  viewPort: number[];
   theme: string; // TODO: check
 }
