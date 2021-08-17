@@ -83,7 +83,7 @@ export default class Branch {
         y: parentbbox.h / 2 + parentbbox.y,
       })
       .curvesTo({
-        x: this.bbox.x + 80,
+        x: this.direction === 'ltr' ? this.bbox.x + 80 : this.bbox.x + this.bbox.w - 80,
         y: this.bbox.y + this.bbox.h / 2,
       })
       .end({
