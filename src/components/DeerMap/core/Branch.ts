@@ -52,8 +52,8 @@ export default class Branch {
       .rect(w, h)
       .x(x)
       .y(y)
-      .fill(randomColor());
-      // .fill('transparent');
+      // .fill(randomColor());
+      .fill('transparent');
     this._pathNode = BranchPath.of({ level: this._level, direction: this.direction });
     this._pathNode.insertInto(this._drawerNode);
     this._ractBg.on('click', () => {
