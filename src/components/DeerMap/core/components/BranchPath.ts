@@ -19,6 +19,7 @@ type Pos = {
 };
 
 const levelWidthMap = {
+
   1: 12,
   2: 8,
   other: 5,
@@ -137,7 +138,7 @@ export default class BranchPath {
       if (textPathNode) {
         const offset = this._drawerNode.length() - (this._endPos.x - this._curvePos.x);
         textPathNode.attr({
-          startOffset: offset,
+          startOffset: Math.round(offset),
         });
       }
     } else {
